@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\MediaTool.Core\MediaTool.Core.csproj" />
+    <ProjectReference Include="..\MediaTool.Infrastructure\MediaTool.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WPF-UI" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="Exists('..\..\.tools\ffmpeg\ffmpeg.exe')">
+    <Content Include="..\..\.tools\ffmpeg\ffmpeg.exe" Link="sidecars\ffmpeg.exe" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\.tools\ffmpeg\ffprobe.exe" Link="sidecars\ffprobe.exe" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\sidecars\ffmpeg.json" Link="sidecars\ffmpeg.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup Condition="Exists('..\..\.tools\whisper\whisper-cli.exe')">
+    <Content Include="..\..\.tools\whisper\whisper-cli.exe" Link="sidecars\whisper\whisper-cli.exe" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\.tools\whisper\whisper.dll" Link="sidecars\whisper\whisper.dll" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\.tools\whisper\ggml.dll" Link="sidecars\whisper\ggml.dll" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\.tools\whisper\ggml-base.dll" Link="sidecars\whisper\ggml-base.dll" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\.tools\whisper\ggml-cpu-x64.dll" Link="sidecars\whisper\ggml-cpu-x64.dll" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <ApplicationIcon>Assets\MediaTool.ico</ApplicationIcon>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\MediaTool.ico" />
+  </ItemGroup>
+
+</Project>

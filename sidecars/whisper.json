@@ -1,0 +1,8 @@
+{
+  "name": "whisper.cpp CPU sidecar",
+  "version": "1.9.3-b4938",
+  "architecture": "x64",
+  "downloadUrl": "https://github.com/ggml-org/whisper.cpp/releases/download/b4938/whisper-bin-x64.zip",
+  "sha256": "c2a4b60edb11f7e11a9191ffb50929535527d4d91c9903dbe3e554583bbbc63d",
+  "license": "MIT"
+}
