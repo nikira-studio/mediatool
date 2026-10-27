@@ -29,7 +29,7 @@ To create a self-contained portable executable and ZIP under `releases`:
 .\scripts\publish-portable.ps1
 ```
 
-The portable build includes the runtime and media engines. A speech model must be downloaded or imported separately in the app. The build scripts and dependency manifests identify the pinned versions and checksums.
+The portable build includes the runtime, media engines, and license notices. A speech model must be downloaded or imported separately in the app. The build scripts and dependency manifests identify the pinned versions and checksums. The current FFmpeg build's complete corresponding source and build materials have not yet been verified, so the package is not ready for redistribution.
 
 ## License and third-party components
 

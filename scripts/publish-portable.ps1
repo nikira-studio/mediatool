@@ -1,5 +1,5 @@
 param(
-    [string]$Version = '0.1.15'
+    [string]$Version = '0.1.16'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -30,6 +30,34 @@ if (Test-Path -LiteralPath $archive) { Remove-Item -LiteralPath $archive -Force 
     -p:DebugSymbols=false
 
 if ($LASTEXITCODE -ne 0) { throw 'Portable publish failed.' }
+
+$noticeDirectory = Join-Path $output 'licenses'
+New-Item -ItemType Directory -Path $noticeDirectory -Force | Out-Null
+Copy-Item -LiteralPath (Join-Path $repoRoot 'LICENSE') -Destination (Join-Path $noticeDirectory 'MediaTool-UNLICENSE.txt')
+Copy-Item -LiteralPath (Join-Path $repoRoot 'sidecars\THIRD-PARTY-NOTICES.md') -Destination $noticeDirectory
+Copy-Item -LiteralPath (Join-Path $repoRoot 'sidecars\whisper-LICENSE.txt') -Destination $noticeDirectory
+Copy-Item -LiteralPath (Join-Path $repoRoot '.tools\ffmpeg\LICENSE') -Destination (Join-Path $noticeDirectory 'FFmpeg-LICENSE.txt')
+Copy-Item -LiteralPath (Join-Path $repoRoot '.tools\ffmpeg\README.txt') -Destination (Join-Path $noticeDirectory 'FFmpeg-README.txt')
+
+$assets = Get-Content -LiteralPath (Join-Path $repoRoot 'src\MediaTool.App\obj\project.assets.json') -Raw | ConvertFrom-Json
+$packageRoots = @($assets.packageFolders.PSObject.Properties.Name)
+function Find-PackageFile([string]$package, [string]$version, [string]$file) {
+    foreach ($root in $packageRoots) {
+        $candidate = Join-Path $root "$package\$version\$file"
+        if (Test-Path -LiteralPath $candidate -PathType Leaf) { return $candidate }
+    }
+    throw "Required license file not found for $package $version : $file"
+}
+$wpfVersion = (($assets.libraries.PSObject.Properties.Name | Where-Object { $_ -match '^WPF-UI/' }) -split '/')[1]
+Copy-Item -LiteralPath (Find-PackageFile 'wpf-ui' $wpfVersion 'LICENSE.md') -Destination (Join-Path $noticeDirectory 'WPF-UI-LICENSE.md')
+Copy-Item -LiteralPath (Find-PackageFile 'wpf-ui' $wpfVersion 'ThirdPartyNotices.txt') -Destination (Join-Path $noticeDirectory 'WPF-UI-THIRD-PARTY-NOTICES.txt')
+$downloads = $assets.project.frameworks.'net10.0-windows'.downloadDependencies
+$runtimeVersion = (($downloads | Where-Object { $_.name -eq 'Microsoft.NETCore.App.Runtime.win-x64' }).version -replace '[\[\] ]', '' -split ',')[0]
+$desktopVersion = (($downloads | Where-Object { $_.name -eq 'Microsoft.WindowsDesktop.App.Runtime.win-x64' }).version -replace '[\[\] ]', '' -split ',')[0]
+if (-not $wpfVersion -or -not $runtimeVersion -or -not $desktopVersion) { throw 'Could not identify the packaged dependency versions.' }
+Copy-Item -LiteralPath (Find-PackageFile 'microsoft.netcore.app.runtime.win-x64' $runtimeVersion 'LICENSE.TXT') -Destination (Join-Path $noticeDirectory 'dotnet-LICENSE.txt')
+Copy-Item -LiteralPath (Find-PackageFile 'microsoft.netcore.app.runtime.win-x64' $runtimeVersion 'THIRD-PARTY-NOTICES.TXT') -Destination (Join-Path $noticeDirectory 'dotnet-THIRD-PARTY-NOTICES.txt')
+Copy-Item -LiteralPath (Find-PackageFile 'microsoft.windowsdesktop.app.runtime.win-x64' $desktopVersion 'LICENSE') -Destination (Join-Path $noticeDirectory 'windowsdesktop-LICENSE.txt')
 
 Compress-Archive -Path (Join-Path $output '*') -DestinationPath $archive -CompressionLevel Optimal
 
