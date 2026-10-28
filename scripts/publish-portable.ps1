@@ -1,5 +1,5 @@
 param(
-    [string]$Version = '0.1.16'
+    [string]$Version = '0.1.18'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -12,8 +12,7 @@ if (-not (Test-Path -LiteralPath $dotnet)) {
     throw 'The local .NET SDK is missing. Run scripts/bootstrap.ps1 first.'
 }
 
-if (Test-Path -LiteralPath $output) { Remove-Item -LiteralPath $output -Recurse -Force }
-if (Test-Path -LiteralPath $archive) { Remove-Item -LiteralPath $archive -Force }
+if ((Test-Path -LiteralPath $output) -or (Test-Path -LiteralPath $archive)) { throw 'The requested release already exists. Choose a new version.' }
 
 & $dotnet publish (Join-Path $repoRoot 'src\MediaTool.App\MediaTool.App.csproj') `
     --no-restore `
@@ -36,8 +35,6 @@ New-Item -ItemType Directory -Path $noticeDirectory -Force | Out-Null
 Copy-Item -LiteralPath (Join-Path $repoRoot 'LICENSE') -Destination (Join-Path $noticeDirectory 'MediaTool-UNLICENSE.txt')
 Copy-Item -LiteralPath (Join-Path $repoRoot 'sidecars\THIRD-PARTY-NOTICES.md') -Destination $noticeDirectory
 Copy-Item -LiteralPath (Join-Path $repoRoot 'sidecars\whisper-LICENSE.txt') -Destination $noticeDirectory
-Copy-Item -LiteralPath (Join-Path $repoRoot '.tools\ffmpeg\LICENSE') -Destination (Join-Path $noticeDirectory 'FFmpeg-LICENSE.txt')
-Copy-Item -LiteralPath (Join-Path $repoRoot '.tools\ffmpeg\README.txt') -Destination (Join-Path $noticeDirectory 'FFmpeg-README.txt')
 
 $assets = Get-Content -LiteralPath (Join-Path $repoRoot 'src\MediaTool.App\obj\project.assets.json') -Raw | ConvertFrom-Json
 $packageRoots = @($assets.packageFolders.PSObject.Properties.Name)

@@ -12,7 +12,7 @@ MediaTool is a Windows desktop app for local video compression, audio extraction
 
 Transcription models are downloaded separately when requested. Transcription runs locally after a model is installed. Large models can be slow on a CPU. Speaker identification is not currently available. Review transcripts for errors.
 
-Settings, downloaded models, and temporary files are stored under `%LOCALAPPDATA%\MediaTool`. Output files are saved in the selected folder or beside the source file. Model downloads require an internet connection.
+Settings, downloaded models, FFmpeg, and temporary files are stored under `%LOCALAPPDATA%\MediaTool`. Output files are saved in the selected folder or beside the source file. The first launch downloads FFmpeg directly from its publisher and requires an internet connection. Model downloads also require an internet connection. Media processing runs locally afterward.
 
 ## Build on Windows
 
@@ -29,8 +29,8 @@ To create a self-contained portable executable and ZIP under `releases`:
 .\scripts\publish-portable.ps1
 ```
 
-The portable build includes the runtime, media engines, and license notices. A speech model must be downloaded or imported separately in the app. The build scripts and dependency manifests identify the pinned versions and checksums. The current FFmpeg build's complete corresponding source and build materials have not yet been verified, so the package is not ready for redistribution.
+The portable build includes the runtime, whisper.cpp, and license notices. FFmpeg is downloaded on first launch. A speech model must be downloaded or imported separately in the app. The build scripts and dependency manifests identify pinned versions and checksums.
 
 ## License and third-party components
 
-MediaTool's own code is released under [The Unlicense](LICENSE). Third-party components retain their own licenses. The bundled FFmpeg build is GPL-3.0-or-later; distributing a package containing it requires compliance with its license, including applicable source and notice obligations. whisper.cpp is MIT licensed. See [sidecars/README.md](sidecars/README.md) and the manifests in that directory before redistributing a build.
+MediaTool's own code is released under [The Unlicense](LICENSE). Third-party components retain their own licenses. whisper.cpp is MIT licensed. FFmpeg is downloaded separately from its publisher under GPL-3.0-or-later and is not included in the portable package. See [third-party notices](sidecars/THIRD-PARTY-NOTICES.md) and the manifests in that directory.

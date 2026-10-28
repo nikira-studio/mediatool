@@ -9,9 +9,7 @@
     <PackageReference Include="WPF-UI" Version="4.3.0" />
   </ItemGroup>
 
-  <ItemGroup Condition="Exists('..\..\.tools\ffmpeg\ffmpeg.exe')">
-    <Content Include="..\..\.tools\ffmpeg\ffmpeg.exe" Link="sidecars\ffmpeg.exe" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="..\..\.tools\ffmpeg\ffprobe.exe" Link="sidecars\ffprobe.exe" CopyToOutputDirectory="PreserveNewest" />
+  <ItemGroup>
     <Content Include="..\..\sidecars\ffmpeg.json" Link="sidecars\ffmpeg.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
