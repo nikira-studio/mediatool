@@ -1,5 +1,5 @@
 param(
-    [string]$Version = '0.1.18'
+    [string]$Version = '1.0.0'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -21,6 +21,7 @@ if ((Test-Path -LiteralPath $output) -or (Test-Path -LiteralPath $archive)) { th
     --self-contained true `
     --output $output `
     -p:PublishSingleFile=true `
+    -p:Version=$Version `
     -p:IncludeNativeLibrariesForSelfExtract=true `
     -p:IncludeAllContentForSelfExtract=true `
     -p:EnableCompressionInSingleFile=true `
