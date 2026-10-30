@@ -163,7 +163,7 @@ public sealed class TranscriptionJobHandler(
             job.Report(new("Preparing audio", null, TimeSpan.Zero));
             var convert = await runner.RunAsync(new(ffmpeg.Ffmpeg,
                 ["-hide_banner", "-nostdin", "-y", "-i", request.Input.FullPath, "-vn", "-ac", "1", "-ar", "16000", "-c:a", "pcm_s16le", wavPath]), cancellationToken).ConfigureAwait(false);
-            if (convert.ExitCode != 0) return JobResult.Failed(new("engine_failure", "MediaTool could not prepare audio for transcription.", "Open details, then retry.", string.Join(Environment.NewLine, convert.StandardError)));
+            if (convert.ExitCode != 0) return JobResult.Failed(new("engine_failure", "MediaTool could not prepare audio for transcription.", "Open details, then retry.", DiagnosticsRedactor.Redact(string.Join(Environment.NewLine, convert.StandardError), false)));
 
             var directory = request.Output.FolderPath ?? Path.GetDirectoryName(request.Input.FullPath)!;
             if (!Directory.Exists(directory)) return JobResult.Failed(new("output_not_writable", "The output folder does not exist.", "Choose another output folder."));
@@ -190,8 +190,9 @@ public sealed class TranscriptionJobHandler(
                 var now = DateTimeOffset.UtcNow;
                 job.Report(new(WhisperProgressParser.DescribePhase(progress.Value, now - transcriptionStarted), progress, now - (job.StartedAt ?? job.CreatedAt)));
             }), cancellationToken).ConfigureAwait(false);
-            if (transcribed.ExitCode != 0) return JobResult.Failed(new("engine_failure", "The local transcription engine could not finish.", "Try a shorter file or another model.", string.Join(Environment.NewLine, transcribed.StandardError)));
+            if (transcribed.ExitCode != 0) return JobResult.Failed(new("engine_failure", "The local transcription engine could not finish.", "Try a shorter file or another model.", DiagnosticsRedactor.Redact(string.Join(Environment.NewLine, transcribed.StandardError), false)));
 
+            job.Report(new("Finishing transcript", null, DateTimeOffset.UtcNow - (job.StartedAt ?? job.CreatedAt)));
             if (timestampedText)
             {
                 var srtPath = prefix + ".srt";
@@ -217,7 +218,7 @@ public sealed class TranscriptionJobHandler(
         }
         catch (MediaInspectionException exception)
         {
-            return JobResult.Failed(new(exception.Code, exception.Message, "Choose a readable media file.", exception.Detail));
+            return JobResult.Failed(new(exception.Code, exception.Message, "Choose a readable media file.", exception.Detail is null ? null : DiagnosticsRedactor.Redact(exception.Detail, false)));
         }
         finally
         {

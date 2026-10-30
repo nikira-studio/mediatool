@@ -7,7 +7,7 @@ public static partial class DiagnosticsRedactor
     public static string Redact(string text, bool detailedLogging)
     {
         if (detailedLogging || string.IsNullOrEmpty(text)) return text;
-        var result = WindowsPath().Replace(text, match => $"<path>\\{Path.GetFileName(match.Value)}");
+        var result = WindowsPath().Replace(text, "<path>");
         var userName = Environment.UserName;
         return string.IsNullOrWhiteSpace(userName) ? result : result.Replace(userName, "<user>", StringComparison.OrdinalIgnoreCase);
     }

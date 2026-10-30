@@ -186,7 +186,7 @@ public sealed class SequentialJobService : IJobService
                 catch (Exception exception)
                 {
                     if (!JobStateMachine.IsTerminal(job.State))
-                        job.Complete(JobResult.Failed(new("unexpected_error", "The job could not finish.", "Open details, then retry.", exception.ToString())));
+                        job.Complete(JobResult.Failed(new("unexpected_error", "The job could not finish.", "Open details, then retry.", exception.GetType().Name)));
                 }
                 finally
                 {

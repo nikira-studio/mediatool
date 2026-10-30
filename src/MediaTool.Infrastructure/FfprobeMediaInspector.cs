@@ -17,7 +17,7 @@ public sealed class FfprobeMediaInspector(string ffprobePath, IProcessRunner pro
             ["-v", "error", "-print_format", "json", "-show_format", "-show_streams", input.FullPath]), cancellationToken).ConfigureAwait(false);
 
         if (result.ExitCode != 0)
-            throw new MediaInspectionException("unreadable_input", "FFprobe could not read the media file.", string.Join(Environment.NewLine, result.StandardError));
+            throw new MediaInspectionException("unreadable_input", "FFprobe could not read the media file.", DiagnosticsRedactor.Redact(string.Join(Environment.NewLine, result.StandardError), false));
 
         return FfprobeJsonParser.Parse(input, string.Join(Environment.NewLine, result.StandardOutput));
     }

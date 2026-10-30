@@ -136,7 +136,7 @@ public sealed class CompressionJobHandler(
         }
         catch (MediaInspectionException exception)
         {
-            return JobResult.Failed(new(exception.Code, exception.Message, "Choose a readable media file.", exception.Detail));
+            return JobResult.Failed(new(exception.Code, exception.Message, "Choose a readable media file.", exception.Detail is null ? null : DiagnosticsRedactor.Redact(exception.Detail, false)));
         }
         catch (CompressionPlanningException exception)
         {

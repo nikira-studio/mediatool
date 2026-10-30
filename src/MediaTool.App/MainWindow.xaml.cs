@@ -77,42 +77,7 @@ public partial class MainWindow : Window
             transcribeView.MoveFocus(new TraversalRequest(FocusNavigationDirection.First));
             return;
         }
-        var title = tool switch
-        {
-            ToolId.VideoCompress => "Video Compress",
-            ToolId.AudioExtract => "Audio Extract",
-            ToolId.Transcribe => "Transcribe",
-            _ => throw new ArgumentOutOfRangeException(nameof(tool))
-        };
-        var description = tool switch
-        {
-            ToolId.VideoCompress => "Make an MP4 fit under a file-size limit.",
-            ToolId.AudioExtract => "Save an audio track as an MP3.",
-            ToolId.Transcribe => "Create local text and subtitle files.",
-            _ => string.Empty
-        };
-        var panel = CreateToolPanel(title, description);
-        WorkPanel.Content = panel;
-        panel.MoveFocus(new TraversalRequest(FocusNavigationDirection.First));
-    }
-
-    private StackPanel CreateToolPanel(string title, string description)
-    {
-        var panel = new StackPanel { Margin = new Thickness(42, 34, 42, 42), MaxWidth = 920 };
-        panel.Children.Add(new TextBlock { Text = title, FontSize = 28, FontWeight = FontWeights.SemiBold });
-        panel.Children.Add(new TextBlock { Text = description, FontSize = 14, Opacity = 0.72, Margin = new Thickness(0, 6, 0, 28) });
-        var inputCard = new Border { BorderBrush = SystemColors.ActiveBorderBrush, BorderThickness = new Thickness(1), CornerRadius = new CornerRadius(8), Padding = new Thickness(28), MinHeight = 180 };
-        var inputStack = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
-        inputStack.Children.Add(new TextBlock { Text = "Drop media files here", FontSize = 18, FontWeight = FontWeights.Medium, HorizontalAlignment = HorizontalAlignment.Center });
-        inputStack.Children.Add(new TextBlock { Text = "or choose files from this computer", Opacity = 0.68, Margin = new Thickness(0, 7, 0, 18), HorizontalAlignment = HorizontalAlignment.Center });
-        inputStack.Children.Add(new Button { Content = "Choose files", Padding = new Thickness(18, 8, 18, 8), HorizontalAlignment = HorizontalAlignment.Center, IsEnabled = false, ToolTip = "File selection is connected in the tool implementation phase." });
-        inputCard.Child = inputStack;
-        panel.Children.Add(inputCard);
-        var status = launchPaths.Count == 0
-            ? "The shared shell is ready. Tool controls arrive after the job engine passes its foundation tests."
-            : $"{launchPaths.Count} launch path{(launchPaths.Count == 1 ? " was" : "s were")} received and will be added when this tool is enabled.";
-        panel.Children.Add(new TextBlock { Text = status, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(2, 20, 2, 0), Opacity = 0.7 });
-        return panel;
+        throw new ArgumentOutOfRangeException(nameof(tool));
     }
 
     private void ShowSettings()
@@ -212,6 +177,8 @@ public partial class MainWindow : Window
             ActivityToolTextBlock.Text = active.Request.Tool switch { ToolId.VideoCompress => "Compressing", ToolId.AudioExtract => "Extracting audio", ToolId.Transcribe => "Transcribing", _ => "Working" };
             var waiting = unfinished.Count(candidate => candidate.State == JobState.Queued);
             var phase = active.Progress?.Phase ?? (active.State == JobState.Queued ? "Waiting" : active.State.ToString());
+            if (active.Request.Tool == ToolId.Transcribe && active.Progress?.Percent is { } percent && percent.Value < 100 && phase.StartsWith("Transcribing locally", StringComparison.Ordinal))
+                phase = $"{phase} · {percent.Value:0}%";
             ActivityPhaseTextBlock.Text = waiting == 0 ? phase : $"{phase} · {waiting} waiting";
         });
         if (job.State == JobState.Completed && !jobService.Jobs.Any(candidate => !JobStateMachine.IsTerminal(candidate.State)) && handledCompletionActions.Add(job.Id))
